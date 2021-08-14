@@ -3,6 +3,7 @@ from template.src.problem.problem_interface import ProblemInterface
 import random
 import matplotlib.pyplot as plt
 
+
 class RegressionProblem(ProblemInterface):
     def __init__(self, fname):
         # load dataset
@@ -26,7 +27,6 @@ class RegressionProblem(ProblemInterface):
             individual = []
         return population
 
-
     def fitness(self, population):
         # Calcular a função fitness para toda população
         fitn = []
@@ -35,14 +35,14 @@ class RegressionProblem(ProblemInterface):
             # Representa a fitness the um indivíduo
             for k in range(0, len(self.x)):
                 yo = self.y[k]
-                fxi =  ( population[i][0]
-                       + population[i][1]*np.sin(  self.x[k]) + population[i][2]*np.cos(  self.x[k])
-                       + population[i][3]*np.sin(2*self.x[k]) + population[i][4]*np.cos(2*self.x[k])
-                       + population[i][5]*np.sin(3*self.x[k]) + population[i][6]*np.cos(3*self.x[k])
-                       + population[i][7]*np.sin(4*self.x[k]) + population[i][8]*np.cos(4*self.x[k])
-                )
-                erro = erro + (yo - fxi)**2
-            erro_mq = float(erro/len(self.x))
+                fxi = (population[i][0]
+                       + population[i][1] * np.sin(self.x[k]) + population[i][2] * np.cos(self.x[k])
+                       + population[i][3] * np.sin(2 * self.x[k]) + population[i][4] * np.cos(2 * self.x[k])
+                       + population[i][5] * np.sin(3 * self.x[k]) + population[i][6] * np.cos(3 * self.x[k])
+                       + population[i][7] * np.sin(4 * self.x[k]) + population[i][8] * np.cos(4 * self.x[k])
+                       )
+                erro = erro + (yo - fxi) ** 2
+            erro_mq = float(erro / len(self.x))
             fitn.append(erro_mq)
         best_fit = min(fitn)
         best_pos = fitn.index(best_fit)
@@ -59,16 +59,21 @@ class RegressionProblem(ProblemInterface):
         return newpopulation
 
     def mutation(self, individual, mutation_rate):
-
         lista = []
-        prob = np.random.random_sample()
-        if prob < mutation_rate:
 
-            # print("Individual before the mutation: ")
-            # print("    ", individual)
+        # Em 50% dos casos:
+        # muda uma coordenada para outro valor no intervalo de (-100 a 100)
+        prob = random.random()
+        if prob < 0.5:
 
-            for i in range(0, len(individual)):
-                lista.append(i)
+            print("Individual before the mutation: ")
+            print("    ", individual)
+
+            random.uniform(0, 8)
+
+
+            for i in range(0, 20):
+                lista.append(np.random.randint(9))
 
             # Randomly select two positions
             rand_pos1, rand_pos2 = random.sample(lista, 2)
@@ -77,65 +82,28 @@ class RegressionProblem(ProblemInterface):
             aux = individual[rand_pos1]
             individual[rand_pos1] = individual[rand_pos2]
             individual[rand_pos2] = aux
-
-            # print("Individual after the mutation: ")
-            # print("    ",individual)
+        else:
+            print("Individual after the mutation: ")
+            print("    ",individual)
         return individual
 
     def crossover(self, p1, p2):
-        son1, son2 = ([0] * len(p1)), ([0] * len(p1))
+        # Randomly select a value for alpha
+        son1, son2, alpha = ([0] * len(p1)), ([0] * len(p1)), []
 
-        # Randomly choose two points to slice a solution
-        lista = []
-        for i in range(0, len(p1)):
-            lista.append(random.random())
-        corte1, corte2 = random.sample(lista, 2)
-
-        if corte1 > corte2:
-            start_point = corte2
-            end_point = corte1
-        else:
-            start_point = corte1
-            end_point = corte2
-
-        # Return 1 son per function, then it's only necessary to flip p1 and p2
-        # to generate the second son
-        son1 = self.subcrossover(start_point, end_point, p1, p2, son1)
-        # print("filho ",son1)
-        son2 = self.subcrossover(start_point, end_point, p2, p1, son2)
-        # print("filho ",son2)
+        alpha = random.random()
+        for k in range(0, len(p1) - 1):
+            pai1 = p1[k]
+            pai2 = p2[k]
+            son1[k] = pai1 * alpha + pai2 * (1 - alpha)
+            son2[k] = pai2 * alpha + pai1 * (1 - alpha)
+        """print(p1, "\n", p2)
+        print("Alpha: ", alpha)
+        print(son1)"""
         return son1, son2
 
     def subcrossover(self, start_point, end_point, p1, p2, son1):
-
-        # Write the gene of pai2 in the son1
-        for i in range(start_point, end_point):
-            son1[i] = p2[i]
-
-        # Write the gene of pai1 in the son1 - Part 1
-        j = end_point
-        end_list = len(p1)
-        for i in range(end_point, end_list):
-
-            if p1[i] not in son1:
-                son1[j] = p1[i]
-                j = j + 1
-
-            if j == len(p1):
-                j = 0
-
-        # Write the gene of pai1 in the son1 - Part 2
-        for i in range(0, end_list):
-
-            if p1[i] not in son1:
-                son1[j] = p1[i]
-                j = j + 1
-
-            if j == start_point:
-                break
-            elif j == len(p1):
-                j = 0
-        return son1
+        pass
 
     def selection_process(self, fitn):
         lista = []
