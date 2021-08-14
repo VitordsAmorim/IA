@@ -29,7 +29,7 @@ class RegressionProblem(ProblemInterface):
 
     def fitness(self, population):
         # Calcular a função fitness para toda população
-        fitn = []
+        fitn, fx = [], []
         for i in range(0, len(population)):
             erro = 0
             # Representa a fitness the um indivíduo
@@ -47,7 +47,7 @@ class RegressionProblem(ProblemInterface):
         best_fit = min(fitn)
         best_pos = fitn.index(best_fit)
         path = population[best_pos]
-        return best_fit, best_pos, path, fitn
+        return best_fit, best_pos, path, fitn,
 
     def elitism(self, newpopulation, bestindividualold, fitn):
 
@@ -59,32 +59,17 @@ class RegressionProblem(ProblemInterface):
         return newpopulation
 
     def mutation(self, individual, mutation_rate):
-        lista = []
-
-        # Em 50% dos casos:
-        # muda uma coordenada para outro valor no intervalo de (-100 a 100)
+        # Em 50% dos casos: altera um valor para outro no intervalo de (-100 a 100)
         prob = random.random()
         if prob < 0.5:
-
-            print("Individual before the mutation: ")
-            print("    ", individual)
-
-            random.uniform(0, 8)
-
-
-            for i in range(0, 20):
-                lista.append(np.random.randint(9))
-
-            # Randomly select two positions
-            rand_pos1, rand_pos2 = random.sample(lista, 2)
-
-            # Swap the position of two cities
-            aux = individual[rand_pos1]
-            individual[rand_pos1] = individual[rand_pos2]
-            individual[rand_pos2] = aux
+            rand_pos1 = np.random.randint(9)
+            individual[rand_pos1] = random.uniform(-100, 100)
+        # Nos outros 50% dos casos somasse a cada um dos 9 valores um valor
+        # calculado pela distribuição normal, de -1 a 1
         else:
-            print("Individual after the mutation: ")
-            print("    ",individual)
+            for i in range(0, 9):
+                xm = np.random.normal(scale=1)
+                individual[i] = individual[i] + xm
         return individual
 
     def crossover(self, p1, p2):
@@ -141,23 +126,30 @@ class RegressionProblem(ProblemInterface):
         x = ngeracoes
         y = best_fitness
         plt.plot(x, y)
-        plt.title("TSP - 30 cities")
-        plt.xlabel("Nº Generations")
+        plt.title("Regression with periodical functions")
+        plt.xlabel("Number of generations")
         plt.ylabel("Fitness")
         plt.show()
         pass
 
     def plot_bestfit(self, best_individual):
-        xp, yp = [], []
-        best_individual.insert(0, 0)
-        best_individual.insert(len(best_individual), 0)
-        for k in range(0, len(best_individual)):
-            indice = best_individual[k]
-            xp.append(float(self.x[indice]))
-            yp.append(float(self.y[indice]))
+        yfx = []
+        population = best_individual
+        for k in range(0, len(self.x)):
+            fxi = (population[0]
+                   + population[1] * np.sin(    self.x[k]) + population[2] * np.cos(    self.x[k])
+                   + population[3] * np.sin(2 * self.x[k]) + population[4] * np.cos(2 * self.x[k])
+                   + population[5] * np.sin(3 * self.x[k]) + population[6] * np.cos(3 * self.x[k])
+                   + population[7] * np.sin(4 * self.x[k]) + population[8] * np.cos(4 * self.x[k])
+            )
+            yfx.append(fxi)
 
-        x = np.asarray(xp)
-        y = np.asarray(yp)
-        plt.plot(x, y, marker="o", markerfacecolor="r")
+        fig, ax = plt.subplots()  # Create a figure and an axes.
+        ax.plot(self.x, self.y, 'o', label='experimental data')  # Plot some data on the axes.
+        ax.plot(self.x, yfx, label='Regression')  # Plot more data on the axes...
+        ax.set_xlabel('x')  # Add an x-label to the axes.
+        ax.set_ylabel('y')  # Add a y-label to the axes.
+        ax.set_title("Regression with periodical functions")  # Add a title to the axes.
+        ax.legend()  # Add a legend.
         plt.show()
         pass
