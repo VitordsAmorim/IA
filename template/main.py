@@ -26,7 +26,6 @@ def generate_report(output, problem, n_generations, best_fitness, deltat):
     w = csv.writer(f)
     w.writerow([menorfit, maiorfit, media, dp, delta_time])
     f.close()
-
     pass
 
 
@@ -45,7 +44,7 @@ def read_command_line_args():
     parser = argparse.ArgumentParser(
         description='Optimization with genetic algorithms.')
 
-    parser.add_argument('-p', '--problem', default='tsp',
+    parser.add_argument('-p', '--problem', default='regression',
                         choices=["classification", "regression", "tsp"])
     parser.add_argument('-n', '--n_generations', type=int,
                         default=100, help='number of generations.')
@@ -76,7 +75,6 @@ def main():
     t_final = time.time()
     deltat = t_final - t_inicial
     generate_report(graph, problem, n, best_fitness, deltat)
-
     print("OK!")
 
 
