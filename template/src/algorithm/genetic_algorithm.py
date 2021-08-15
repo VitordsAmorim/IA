@@ -34,7 +34,7 @@ def genetic_algorithm(problem, population_size, n_generations, round, mutation_r
         # ELITISMO
         # Faz com que o melhor indivíduo da geraçao passada sobreviva para a nova
         # geracao, substituindo o pior individuo da geraçao atual
-        print("Iterations:", k, "best fitness:", best_fit)
+        print("Round:", round,"Iterations:", k, "best fitness:", best_fit)
         best_solutions.append(best_fit)
         best_individual_old = best_individual
         old_population = problem.elitism(new_population, best_individual_old, fitn)
