@@ -1,4 +1,4 @@
-
+import csv
 import argparse
 from src.problem.regression_problem import RegressionProblem
 from src.problem.classification_problem import ClassificationProblem
@@ -11,7 +11,7 @@ import numpy as np
 def generate_report(output, problem, n_generations, best_fitness, deltat):
     problem.plot(output, n_generations)
     menorfit = min(best_fitness)
-    meiorfit = max(best_fitness)
+    maiorfit = max(best_fitness)
     media = sum(best_fitness)
     media = media/5
     delta_time = deltat/5
@@ -21,6 +21,12 @@ def generate_report(output, problem, n_generations, best_fitness, deltat):
         dp = dp + (best_fitness[k] - media)**2
     dp = dp/5
     dp = np.sqrt(dp)
+
+    f = open('Output.csv', 'a', newline='', encoding='utf-8')
+    w = csv.writer(f)
+    w.writerow([menorfit, maiorfit, media, dp, delta_time])
+    f.close()
+
     pass
 
 
