@@ -1,5 +1,5 @@
 
-def genetic_algorithm(problem, population_size, n_generations, mutation_rate=0.1):
+def genetic_algorithm(problem, population_size, n_generations, round, mutation_rate=0.1):
 
     # Create a initial population
     old_population = problem.initial_population(population_size)
@@ -40,6 +40,6 @@ def genetic_algorithm(problem, population_size, n_generations, mutation_rate=0.1
         old_population = problem.elitism(new_population, best_individual_old, fitn)
         best_fit, best_pos, best_individual, fitn = problem.fitness(new_population)
         ngeracoes.append(k)
-    problem.plot(best_solutions, ngeracoes)
-    problem.plot_bestfit(best_individual)
-    return []
+    #problem.plot(best_solutions, ngeracoes, round)
+    problem.plot_bestfit(best_individual, round)
+    return [best_solutions, ngeracoes]
