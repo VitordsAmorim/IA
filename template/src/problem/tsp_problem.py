@@ -3,6 +3,7 @@ from template.src.problem.problem_interface import ProblemInterface
 import random
 import matplotlib.pyplot as plt
 
+
 class TSPProblem(ProblemInterface):
 
     def __init__(self, fname):
@@ -55,9 +56,8 @@ class TSPProblem(ProblemInterface):
         return best_fit, best_pos, path, fitn
 
     def elitism(self, newpopulation, bestindividualold, fitn):
-
-        # Encontrar a pior solução, para depois
-        # substitui-la pela melhor solução da geração anterior
+        # Encontra o pior individuo da geralção atual e o substitui
+        # pelo melhor indivíduo da geração anterior
         bigger_fitn = max(fitn)
         pos = fitn.index(bigger_fitn)
         newpopulation[pos] = bestindividualold
@@ -184,7 +184,7 @@ class TSPProblem(ProblemInterface):
         y = best_fitness
         plt.plot(x, y)
         plt.title("TSP - 30 cities")
-        plt.xlabel("Nº Gerações")
+        plt.xlabel("Nº Generations")
         plt.ylabel("Fitness")
         plt.show()
         pass

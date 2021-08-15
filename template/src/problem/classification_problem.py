@@ -1,9 +1,9 @@
-
+import random
 import numpy as np
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import train_test_split
-from src.problem.problem_interface import ProblemInterface
-
+from template.src.problem.problem_interface import ProblemInterface
+import matplotlib.pyplot as plt
 
 class ClassificationProblem(ProblemInterface):
     def __init__(self, fname):
@@ -38,58 +38,130 @@ class ClassificationProblem(ProblemInterface):
         self.Ks = [1, 3, 5, 7, 9, 11, 13, 15]
         self.metrics = ["euclidean", "hamming", "canberra", "braycurtis"]
 
-    def new_individual(self):
-        ###################################
-        # TODO
-        ###################################
-        individual = None
-        return individual
+    def initial_population(self, population_size):
+        population, individual = [], []
+        for j in range(0, population_size):
+            for i in range(0, 24):
+                individual.append(random.randint(0, 1))
+            individual.append(random.choice(self.Ks))
+            individual.append(random.choice(self.metrics))
+            population.append(individual)
+            individual = []
+        return population
 
-    def fitness(self, individual):
-        ###################################
-        # TODO
-        ###################################
-        binary_pattern = []
-        K = 0
-        metric = ""
+    def fitness(self, population):
 
-        # return the indices of the features that are not zero.
-        indices = np.nonzero(individual)
+        fitn = []
+        for i in range(0, len(population)):
+            binary_pattern = population[i][:-2]
+            K = population[i][-2]
+            metric = population[i][-1]
 
-        # check if there is at least one feature available
-        if len(indices) == 0:
-            return 1e6
+            # return the indices of the features that are not zero.
+            indices = np.nonzero(binary_pattern)[0]
 
-        # select a subset of columns given their indices
-        x_tr = self.X_train[:, indices]
-        x_val = self.X_val[:, indices]
+            # check if there is at least one feature available
+            if len(indices) == 0:
+                return 1e6
 
-        # build the classifier
-        knn = KNeighborsClassifier(n_neighbors=K, metric=metric)
-        # train
-        knn = knn.fit(x_tr, self.y_train)
-        # predict the classes for the validation set
-        y_pred = knn.predict(x_val)
-        # measure the accuracy
-        acc = np.mean(y_pred == self.y_val)
+            # select a subset of columns given their indices
+            x_tr = self.X_train[:, indices]
+            x_val = self.X_val[:, indices]
 
-        # since the optimization algorithms minimize,
-        # the fitness is defiend as the inverse of the accuracy
-        fitness = -acc
+            # build the classifier
+            knn = KNeighborsClassifier(n_neighbors=K, metric=metric)
+            # train
+            knn = knn.fit(x_tr, self.y_train)
+            # predict the classes for the validation set
+            y_pred = knn.predict(x_val)
+            # measure the accuracy
+            acc = np.mean(y_pred == self.y_val)
 
-        return fitness
+            # since the optimization algorithms minimize,
+            # the fitness is defiend as the inverse of the accuracy
+            fitness = -acc
+            fitn.append(fitness)
+        best_fit = min(fitn)
+        best_pos = fitn.index(best_fit)
+        path = population[best_pos]
+        return best_fit, best_pos, path, fitn
 
-    def mutation(self, individual):
-        ###################################
-        # TODO
-        ###################################
-        return individual
+    def elitism(self, newpopulation, bestindividualold, fitn):
+        # Encontra o pior individuo da geralção atual e o substitui
+        # pelo melhor indivíduo da geração anterior
+        bigger_fitn = max(fitn)
+        pos = fitn.index(bigger_fitn)
+        newpopulation[pos] = bestindividualold
+        return newpopulation
+
+    def mutation(self, individual, mutation_rate):
+        mutation = np.random.random_sample()
+        ind = individual
+        if mutation < mutation_rate:
+            rand_pos1 = np.random.randint(24)
+            if ind[rand_pos1] == 1:
+                ind[rand_pos1] = 0
+            else:
+                ind[rand_pos1] = 1
+            ind[-2] = random.choice(self.Ks)
+            ind[-1] = random.choice(self.metrics)
+        return ind
 
     def crossover(self, p1, p2):
-        ###################################
-        # TODO
-        ###################################
-        return p1, p2
+        cut = random.randint(1, len(p1)-3)
+        son1, son2 = ([0] * len(p1)), ([0] * len(p1))
+        for k in range(0, cut):
+            son1[k] = p1[k]
+            son2[k] = p2[k]
+        for k in range(cut, len(p1)-2):
+            son1[k] = p2[k]
+            son2[k] = p1[k]
+        son1[-2], son1[-1] = p1[-2], p2[-1]
+        son2[-2], son2[-1] = p2[-2], p1[-1]
+        return son1, son2
 
-    def plot(self, individual):
+    def subcrossover(self, start_point, end_point, p1, p2, son1):
+        pass
+
+    def selection_process(self, fitn):
+        lista = []
+        for i in range(0, len(fitn)):
+            lista.append(i)
+
+        # Escolhe aleatoriamente dois individuos para competirem
+        # e o que tiver menor valor de fitness vence, tornando-se o pai1
+        i1, i2 = random.sample(lista, 2)
+        # Selection process - It want to minimize
+        if fitn[i1] > fitn[i2]:
+            pai1 = i2
+        elif fitn[i1] < fitn[i2]:
+            pai1 = i1
+        else:
+            pai1 = i1  # depois colocar uma escolha aleatória caso algo de errado
+
+        # Escolhe aleatoriamente outros dois individuos para competirem
+        # e o que tiver menor valor de fitness vence, tornando-se
+        # o pai 2
+        i1, i2 = random.sample(lista, 2)
+        if fitn[i1] > fitn[i2]:
+            pai2 = i2
+        elif fitn[i1] < fitn[i2]:
+            pai2 = i1
+        else:
+            pai2 = i1
+        return pai1, pai2
+
+    def plot(self, best_fitness, ngeracoes):
+        best_fitness = np.asarray(best_fitness)
+        ngeracoes = np.asarray(ngeracoes)
+        x = ngeracoes
+        y = best_fitness
+        plt.plot(x, y)
+        plt.title("Hyperparameter optimization")
+        plt.xlabel("Number of generations")
+        plt.ylabel("Fitness")
+        plt.show()
+        pass
+
+    def plot_bestfit(self, best_individual):
         pass

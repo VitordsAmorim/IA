@@ -50,41 +50,38 @@ class RegressionProblem(ProblemInterface):
         return best_fit, best_pos, path, fitn,
 
     def elitism(self, newpopulation, bestindividualold, fitn):
-
-        # Encontrar a pior solução, para depois
-        # substitui-la pela melhor solução da geração anterior
+        # Encontra o pior individuo da geralção atual e o substitui
+        # pelo melhor indivíduo da geração anterior
         bigger_fitn = max(fitn)
         pos = fitn.index(bigger_fitn)
         newpopulation[pos] = bestindividualold
         return newpopulation
 
     def mutation(self, individual, mutation_rate):
-        # Em 50% dos casos: altera um valor para outro no intervalo de (-100 a 100)
-        prob = random.random()
-        if prob < 0.5:
-            rand_pos1 = np.random.randint(9)
-            individual[rand_pos1] = random.uniform(-100, 100)
-        # Nos outros 50% dos casos somasse a cada um dos 9 valores um valor
-        # calculado pela distribuição normal, de -1 a 1
-        else:
-            for i in range(0, 9):
-                xm = np.random.normal(scale=1)
-                individual[i] = individual[i] + xm
-        return individual
+        mutation = np.random.random_sample()
+        ind = individual
+        if mutation < mutation_rate:
+            # Em 50% dos casos: altera um valor para outro no intervalo de (-100 a 100)
+            prob = random.random()
+            if prob < 0.5:
+                rand_pos1 = np.random.randint(9)
+                ind[rand_pos1] = random.uniform(-100, 100)
+            # Nos outros 50% dos casos somasse a cada um dos 9 valores um valor
+            # calculado pela distribuição normal, de -1 a 1
+            else:
+                for i in range(0, 9):
+                    xm = np.random.normal(scale=1)
+                    ind[i] = ind[i] + xm
+        return ind
 
     def crossover(self, p1, p2):
-        # Randomly select a value for alpha
         son1, son2, alpha = ([0] * len(p1)), ([0] * len(p1)), []
-
         alpha = random.random()
         for k in range(0, len(p1) - 1):
             pai1 = p1[k]
             pai2 = p2[k]
             son1[k] = pai1 * alpha + pai2 * (1 - alpha)
             son2[k] = pai2 * alpha + pai1 * (1 - alpha)
-        """print(p1, "\n", p2)
-        print("Alpha: ", alpha)
-        print(son1)"""
         return son1, son2
 
     def subcrossover(self, start_point, end_point, p1, p2, son1):
@@ -96,8 +93,7 @@ class RegressionProblem(ProblemInterface):
             lista.append(i)
 
         # Escolhe aleatoriamente dois individuos para competirem
-        # e o que tiver menor valor de fitness vence, tornando-se
-        # o pai 1
+        # e o que tiver menor valor de fitness vence, tornando-se o pai1
         i1, i2 = random.sample(lista, 2)
         # Selection process - It want to minimize
         if fitn[i1] > fitn[i2]:
@@ -120,7 +116,6 @@ class RegressionProblem(ProblemInterface):
         return pai1, pai2
 
     def plot(self, best_fitness, ngeracoes):
-
         best_fitness = np.asarray(best_fitness)
         ngeracoes = np.asarray(ngeracoes)
         x = ngeracoes
@@ -137,15 +132,15 @@ class RegressionProblem(ProblemInterface):
         population = best_individual
         for k in range(0, len(self.x)):
             fxi = (population[0]
-                   + population[1] * np.sin(    self.x[k]) + population[2] * np.cos(    self.x[k])
+                   + population[1] * np.sin(self.x[k]) + population[2] * np.cos(self.x[k])
                    + population[3] * np.sin(2 * self.x[k]) + population[4] * np.cos(2 * self.x[k])
                    + population[5] * np.sin(3 * self.x[k]) + population[6] * np.cos(3 * self.x[k])
                    + population[7] * np.sin(4 * self.x[k]) + population[8] * np.cos(4 * self.x[k])
-            )
+                   )
             yfx.append(fxi)
 
         fig, ax = plt.subplots()  # Create a figure and an axes.
-        ax.plot(self.x, self.y, 'o', label='experimental data')  # Plot some data on the axes.
+        ax.plot(self.x, self.y, 'o', label='Experimental data')  # Plot some data on the axes.
         ax.plot(self.x, yfx, label='Regression')  # Plot more data on the axes...
         ax.set_xlabel('x')  # Add an x-label to the axes.
         ax.set_ylabel('y')  # Add a y-label to the axes.
