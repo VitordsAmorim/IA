@@ -204,7 +204,7 @@ class TSPProblem(ProblemInterface):
                title='Problema do caixeiro-viajante - 30 cidades')
         ax.grid()
 
-        plt.savefig("Image/fitness")
+        plt.savefig("Image/tsp_fitness")
         plt.clf()
         pass
 

@@ -1,4 +1,5 @@
 import random
+import csv
 import numpy as np
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import train_test_split
@@ -163,5 +164,40 @@ class ClassificationProblem(ProblemInterface):
         plt.show()
         pass
 
-    def plot_bestfit(self, best_individual):
+    def plot(self, best_fitness, ngeracoes):
+
+        best_f, generation = best_fitness, ngeracoes
+        ngeracoes = np.asarray(ngeracoes)
+        xi = ngeracoes
+
+        y0 = np.asarray(best_f[0])
+        y1 = np.asarray(best_f[1])
+        y2 = np.asarray(best_f[2])
+        y3 = np.asarray(best_f[3])
+        y4 = np.asarray(best_f[4])
+
+        media = (y0 + y1 + y2 + y3 + y4) / 5
+
+        fig, ax = plt.subplots()
+        # ax.plot(xi, yi)
+        ax.plot(xi, y0, 'b-',
+                xi, y1, 'b-',
+                xi, y2, 'b-',
+                xi, y3, 'b-',
+                xi, y4, 'b-',
+                xi, media, 'r-',
+                )
+        ax.set(xlabel='gerações', ylabel='fitness',
+               title='"Busca de Hyperparametros"')
+        ax.grid()
+
+        plt.savefig("Image/Hyperparametros_fitness")
+        plt.clf()
+        pass
+
+    def plot_bestfit(self, best_individual, rnd):
+        f = open('Output.csv', 'a', newline='', encoding='utf-8')
+        w = csv.writer(f)
+        w.writerow(['Hyperparametros:', best_individual[-2:]])
+        f.close()
         pass
