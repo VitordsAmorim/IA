@@ -116,18 +116,37 @@ class RegressionProblem(ProblemInterface):
         return pai1, pai2
 
     def plot(self, best_fitness, ngeracoes):
-        best_fitness = np.asarray(best_fitness)
+
+        best_f, generation = best_fitness, ngeracoes
         ngeracoes = np.asarray(ngeracoes)
-        x = ngeracoes
-        y = best_fitness
-        plt.plot(x, y)
-        plt.title("Regression with periodical functions")
-        plt.xlabel("Number of generations")
-        plt.ylabel("Fitness")
-        plt.show()
+        xi = ngeracoes
+
+        y0 = np.asarray(best_f[0])
+        y1 = np.asarray(best_f[1])
+        y2 = np.asarray(best_f[2])
+        y3 = np.asarray(best_f[3])
+        y4 = np.asarray(best_f[4])
+
+        media = (y0 + y1 + y2 + y3 + y4) / 5
+
+        fig, ax = plt.subplots()
+        # ax.plot(xi, yi)
+        ax.plot(xi, y0, 'b-',
+                xi, y1, 'b-',
+                xi, y2, 'b-',
+                xi, y3, 'b-',
+                xi, y4, 'b-',
+                xi, media, 'r-',
+                )
+        ax.set(xlabel='gerações', ylabel='fitness',
+               title='Regressão com função periodica')
+        ax.grid()
+
+        plt.savefig("Image/regression_fitness")
+        plt.clf()
         pass
 
-    def plot_bestfit(self, best_individual):
+    def plot_bestfit(self, best_individual, rnd):
         yfx = []
         population = best_individual
         for k in range(0, len(self.x)):
@@ -144,7 +163,11 @@ class RegressionProblem(ProblemInterface):
         ax.plot(self.x, yfx, label='Regression')  # Plot more data on the axes...
         ax.set_xlabel('x')  # Add an x-label to the axes.
         ax.set_ylabel('y')  # Add a y-label to the axes.
-        ax.set_title("Regression with periodical functions")  # Add a title to the axes.
+        ax.set_title("Regressão com função periodica")  # Add a title to the axes.
         ax.legend()  # Add a legend.
-        plt.show()
+        #plt.show()
+
+        name = "regression_" + str(rnd)
+        plt.savefig("Image/" + name)
+        plt.clf()
         pass

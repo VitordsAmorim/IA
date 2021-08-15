@@ -178,8 +178,8 @@ class TSPProblem(ProblemInterface):
         return pai1, pai2
 
     def plot(self, best_fitness, ngeracoes):
-        best_f, generation = best_fitness, ngeracoes
 
+        best_f, generation = best_fitness, ngeracoes
         ngeracoes = np.asarray(ngeracoes)
         xi = ngeracoes
 
@@ -204,7 +204,7 @@ class TSPProblem(ProblemInterface):
                title='Problema do caixeiro-viajante - 30 cidades')
         ax.grid()
 
-        plt.savefig("Image/fitness.png", dpi=300)
+        plt.savefig("Image/fitness")
         plt.clf()
         pass
 
@@ -226,8 +226,7 @@ class TSPProblem(ProblemInterface):
         plt.ylabel('y')
         plt.plot(x, y, marker="o", markerfacecolor="r")
 
-        name = str(rnd) + "_"
-        name = name + str(self.filename[9:-7])
-        plt.savefig("Image/" + name + ".png", dpi=300)
+        name = str(rnd) + "_tsp"
+        plt.savefig("Image/" + name)
         plt.clf()
         pass
