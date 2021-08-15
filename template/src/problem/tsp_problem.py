@@ -8,6 +8,7 @@ class TSPProblem(ProblemInterface):
 
     def __init__(self, fname):
         # load dataset
+        self.filename = fname
         with open(fname, "r") as f:
             lines = f.readlines()
 
@@ -177,29 +178,56 @@ class TSPProblem(ProblemInterface):
         return pai1, pai2
 
     def plot(self, best_fitness, ngeracoes):
+        best_f, generation = best_fitness, ngeracoes
 
-        best_fitness = np.asarray(best_fitness)
         ngeracoes = np.asarray(ngeracoes)
-        x = ngeracoes
-        y = best_fitness
-        plt.plot(x, y)
-        plt.title("TSP - 30 cities")
-        plt.xlabel("Nº Generations")
-        plt.ylabel("Fitness")
-        plt.show()
+        xi = ngeracoes
+
+        y0 = np.asarray(best_f[0])
+        y1 = np.asarray(best_f[1])
+        y2 = np.asarray(best_f[2])
+        y3 = np.asarray(best_f[3])
+        y4 = np.asarray(best_f[4])
+
+        media = (y0 + y1 + y2 + y3 + y4)/5
+
+        fig, ax = plt.subplots()
+        # ax.plot(xi, yi)
+        ax.plot(xi, y0, 'b-',
+                xi, y1, 'b-',
+                xi, y2, 'b-',
+                xi, y3, 'b-',
+                xi, y4, 'b-',
+                xi, media, 'r-',
+                )
+        ax.set(xlabel='gerações', ylabel='fitness',
+               title='Problema do caixeiro-viajante - 30 cidades')
+        ax.grid()
+
+        plt.savefig("Image/fitness.png", dpi=300)
+        plt.clf()
         pass
 
-    def plot_bestfit(self, best_individual):
+    def plot_bestfit(self, best_individual, rnd):
         xp, yp = [], []
-        best_individual.insert(0, 0)
-        best_individual.insert(len(best_individual), 0)
-        for k in range(0, len(best_individual)):
-            indice = best_individual[k]
+        best_i = best_individual
+        best_i.insert(0, 0)
+        best_i.insert(len(best_i), 0)
+        for k in range(0, len(best_i)):
+            indice = best_i[k]
             xp.append(float(self.x[indice]))
             yp.append(float(self.y[indice]))
 
         x = np.asarray(xp)
         y = np.asarray(yp)
+
+        plt.title("Problema do caixeiro-viajante")
+        plt.xlabel('x')
+        plt.ylabel('y')
         plt.plot(x, y, marker="o", markerfacecolor="r")
-        plt.show()
+
+        name = str(rnd) + "_"
+        name = name + str(self.filename[9:-7])
+        plt.savefig("Image/" + name + ".png", dpi=300)
+        plt.clf()
         pass
