@@ -5,13 +5,22 @@ from src.problem.classification_problem import ClassificationProblem
 from src.problem.tsp_problem import TSPProblem
 from src.algorithm.genetic_algorithm import genetic_algorithm
 import time
+import numpy as np
 
 
-def generate_report(output, problem, n_generations, best_fitness):
+def generate_report(output, problem, n_generations, best_fitness, deltat):
     problem.plot(output, n_generations)
     menorfit = min(best_fitness)
     meiorfit = max(best_fitness)
-    media = sum(best_fitness)/n_generations
+    media = sum(best_fitness)
+    media = media/5
+    delta_time = deltat/5
+
+    dp = 0.0
+    for k in range(0, 5):
+        dp = dp + (best_fitness[k] - media)**2
+    dp = dp/5
+    dp = np.sqrt(dp)
     pass
 
 
@@ -49,6 +58,7 @@ def main():
     problem = build_problem(args.problem)
 
     graph, best_fitness = [], []
+    t_inicial = time.time()
     for i in range(0, 5):
         output, n = genetic_algorithm(
             problem,
@@ -57,7 +67,9 @@ def main():
             round=i)
         graph.append(output)
         best_fitness.append(output[args.n_generations - 1])
-    generate_report(graph, problem, n, best_fitness)
+    t_final = time.time()
+    deltat = t_final - t_inicial
+    generate_report(graph, problem, n, best_fitness, deltat)
 
     print("OK!")
 
